@@ -1,0 +1,75 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class categories {
+   cat_name  /* The category's name */: varchar
+   cat_icon  /* The category's icon */: bytea
+   created_at  /* Creation date */: timestamp with time zone
+   updated_at  /* Last updated date */: timestamp with time zone
+   cat_id  /* The category's uuid */: uuid
+}
+class places {
+   place_name  /* The place's name */: varchar
+   place_latitude  /* The place's latitude */: numeric(6,5)
+   place_longitude  /* The place's longitude */: numeric(6,5)
+   place_address  /* The place's address */: varchar
+   place_description  /* The place's description */: varchar
+   created_at  /* Creation date */: timestamp with time zone
+   updated_at  /* Last updated date */: timestamp with time zone
+   place_id  /* The place's uuid */: uuid
+}
+class places_categories {
+   created_at  /* Creation date */: timestamp with time zone
+   updated_at  /* Last updated date */: timestamp with time zone
+   places_id  /* The place's uuid */: uuid
+   categories_id  /* The category's uuid */: uuid
+}
+class routes {
+   route_data  /* The route's data */: bytea
+   route_name  /* The route's name */: varchar
+   created_at  /* Creation date */: timestamp with time zone
+   updated_at  /* Last updated date */: timestamp with time zone
+   route_id  /* The route's uuid */: uuid
+}
+class routes_categories {
+   created_at  /* Creation date */: timestamp with time zone
+   updated_at  /* Last updated date */: timestamp with time zone
+   routes_id  /* The route's uuid */: uuid
+   categories_id  /* The category's uuid */: uuid
+}
+class routes_places {
+   created_at  /* Creation date */: timestamp with time zone
+   updated_at  /* Last updated date */: timestamp with time zone
+   routes_id  /* The route's uuid */: uuid
+   places_id  /* The place's uuid */: uuid
+}
+class users {
+   usr_name  /* The user's username */: varchar
+   usr_email  /* The user's email */: varchar
+   usr_password_hash  /* The user's password */: varchar
+   usr_email_verified  /* If user's email is verified (default as false) */: boolean
+   usr_role  /* The user's role (user or admin) */: user_role
+   usr_active  /* If user is active (default as true) */: boolean
+   created_at  /* Creation date */: timestamp with time zone
+   updated_at  /* Last updated date */: timestamp with time zone
+   usr_id  /* The user's uuid */: uuid
+}
+class users_routes {
+   created_at  /* Creation date */: timestamp with time zone
+   updated_at  /* Last updated date */: timestamp with time zone
+   user_id  /* The user's uuid */: uuid
+   routes_id  /* The route's uuid */: uuid
+}
+
+places_categories  -[#595959,plain]-^  categories        : "categories_id:cat_id"
+places_categories  -[#595959,plain]-^  places            : "places_id:place_id"
+routes_categories  -[#595959,plain]-^  categories        : "categories_id:cat_id"
+routes_categories  -[#595959,plain]-^  routes            : "routes_id:route_id"
+routes_places      -[#595959,plain]-^  places            : "places_id:place_id"
+routes_places      -[#595959,plain]-^  routes            : "routes_id:route_id"
+users_routes       -[#595959,plain]-^  routes            : "routes_id:route_id"
+users_routes       -[#595959,plain]-^  users             : "user_id:usr_id"
+@enduml
