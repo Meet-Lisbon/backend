@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import pt.meetlisbon.backend.models.entities.Place;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -30,4 +31,24 @@ public interface PlaceRepository extends CrudRepository<Place, UUID> {
             nativeQuery = true
     )
     Iterable<Place> findPlacesByWishlistUser(@Param("userName") String userName);
+
+    @Query(
+            value = "SELECT p.* " +
+                    "FROM routes " +
+                    "INNER JOIN routes_places rp on routes.route_id = rp.routes_id " +
+                    "INNER JOIN places p on p.place_id = rp.places_id " +
+                    "WHERE route_id = :routeId",
+            nativeQuery = true
+    )
+    List<Place> getPlacesByRouteId(@Param("routeId") UUID routeId);
+
+    @Query(
+            value = "SELECT p.* " +
+                    "FROM routes " +
+                    "INNER JOIN routes_places rp on routes.route_id = rp.routes_id " +
+                    "INNER JOIN places p on p.place_id = rp.places_id " +
+                    "WHERE route_name = :routeName",
+            nativeQuery = true
+    )
+    List<Place> getPlacesByRouteName(@Param("routeName") String routeName);
 }

@@ -15,8 +15,9 @@ import java.util.UUID;
 @Table(name = "wishlist")
 public class Wishlist {
     @Id
-    @Type(type = "org.hibernate.type.PostgresUUIDType")
+//    @Type(type = "org.hibernate.type.PostgresUUIDType")
     @Column(name = "wishlist_id", nullable = false)
+    @Type(type="pg-uuid")
     private UUID id;
 
     @Type(type = "org.hibernate.type.PostgresUUIDType")

@@ -20,8 +20,9 @@ import java.util.UUID;
 @Table(name = "categories")
 public class Category {
     @Id
-    @Type(type = "org.hibernate.type.PostgresUUIDType")
+//    @Type(type = "org.hibernate.type.PostgresUUIDType")
     @Column(name = "cat_id", nullable = false)
+    @Type(type="pg-uuid")
     private UUID id;
 
     @NotNull
