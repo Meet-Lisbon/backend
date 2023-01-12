@@ -38,9 +38,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()//
                 .antMatchers("/api/health").permitAll()//
                 .antMatchers("/api/login").permitAll()//
-                .antMatchers("/api/user/register").permitAll()//
+                .antMatchers("/api/users/register").permitAll()//
                 .antMatchers("/api/reset/*").permitAll()//
-                .antMatchers("/api/user/verify/*").permitAll()//
+                .antMatchers("/api/users/verify/*").permitAll()//
                 .anyRequest().authenticated();
 
         // Applying JWT filter
