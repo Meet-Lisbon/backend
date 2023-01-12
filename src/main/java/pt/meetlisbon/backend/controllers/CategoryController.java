@@ -85,6 +85,5 @@ public class CategoryController {
             throw new NotFoundException("Category");
         }
         categoryService.partialUpdate(requestCategory, category);
-
     }
 }
