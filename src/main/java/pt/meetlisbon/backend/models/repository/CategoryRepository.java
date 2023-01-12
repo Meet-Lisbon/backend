@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface CategoryRepository extends CrudRepository<Category, UUID> {
     Category findCategoryByCatNameEquals(String catName);
 
+    Category findCategoryByIdEquals(UUID categoryId);
 }

@@ -15,7 +15,8 @@ import java.util.UUID;
 @Table(name = "routes")
 public class Route {
     @Id
-    @Type(type = "org.hibernate.type.PostgresUUIDType")
+//    @Type(type = "org.hibernate.type.PostgresUUIDType")
+    @Type(type="pg-uuid")
     @Column(name = "route_id", nullable = false)
     private UUID id;
 

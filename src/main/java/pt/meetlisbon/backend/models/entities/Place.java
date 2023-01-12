@@ -20,8 +20,10 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Place {
     @Id
-    @Type(type = "org.hibernate.type.PostgresUUIDType")
+//    @Type(type = "org.hibernate.type.PostgresUUIDType")
     @Column(name = "place_id", nullable = false)
+    @Type(type="pg-uuid")
+
     private UUID id;
 
     @NotNull

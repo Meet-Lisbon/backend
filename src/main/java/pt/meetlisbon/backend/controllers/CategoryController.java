@@ -14,39 +14,45 @@ import pt.meetlisbon.backend.services.CategoryService;
 
 import javax.transaction.Transactional;
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/category")
+@RequestMapping("/api/categories")
 @AllArgsConstructor
 public class CategoryController {
     final CategoryRepository categoryRepository;
     final CategoryService categoryService;
     private static final Logger LOG = LoggerFactory.getLogger(CategoryController.class);
-    @GetMapping("/all")
-    public Iterable<Category> getAll() {
-        return categoryRepository.findAll();
-    }
-
-    @DeleteMapping("/all")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAll() {
-        categoryRepository.deleteAll();
-    }
 
     @GetMapping
-    public Category findByName(@RequestParam String categoryName) {
-        LOG.info("Searching for category: {}", categoryName);
-        Category category = categoryRepository.findCategoryByCatNameEquals(categoryName);
+    public Iterable<Category> getCategory(@RequestParam(required = false) String categoryName, @RequestParam(required = false) UUID categoryId) {
+        Category category;
+        if(categoryName != null) {
+            LOG.info("Searching for category: {}", categoryName);
+            category = categoryRepository.findCategoryByCatNameEquals(categoryName);
+        } else if(categoryId!=null) {
+            LOG.info("Searching for category: {}", categoryId);
+            category = categoryRepository.findCategoryByIdEquals(categoryId);
+        } else return categoryRepository.findAll();
         if(category == null) throw new NotFoundException("Category");
-        return category;
+        return Collections.singleton(category);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping
-    public void deleteCategoryByName(@RequestParam String categoryName) {
-        LOG.info("Searching for category: {}", categoryName);
-        Category category = categoryRepository.findCategoryByCatNameEquals(categoryName);
+    public void deleteCategory(@RequestParam(required = false) String categoryName, @RequestParam(required = false) UUID categoryId) {
+        Category category;
+        if(categoryName != null) {
+            LOG.info("Searching for category: {}", categoryName);
+            category = categoryRepository.findCategoryByCatNameEquals(categoryName);
+        } else if(categoryId!=null) {
+            LOG.info("Searching for category: {}", categoryId);
+            category = categoryRepository.findCategoryByIdEquals(categoryId);
+        } else {
+            categoryRepository.deleteAll();
+            return;
+        }
         if(category == null) throw new NotFoundException("Category");
         categoryRepository.delete(category);
     }
@@ -79,6 +85,5 @@ public class CategoryController {
             throw new NotFoundException("Category");
         }
         categoryService.partialUpdate(requestCategory, category);
-
     }
 }
