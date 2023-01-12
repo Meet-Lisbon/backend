@@ -108,6 +108,7 @@ public class UserController {
             userRepository.save(user);
 
         } catch (Exception e) {
+            e.printStackTrace();
             LOG.info(e.getMessage());
             throw new BadRequestException();
         }
