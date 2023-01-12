@@ -34,7 +34,8 @@ public class PlaceController {
 
     @GetMapping
     public Iterable<Place> findByName(@RequestParam(required = false) String name,
-                            @RequestParam(required = false) UUID id) {
+                                      @RequestParam(required = false) String catName,
+                                      @RequestParam(required = false) UUID id) {
 
         if(name != null) {
             LOG.info("Searching for place: {}", name);
@@ -46,17 +47,14 @@ public class PlaceController {
             Place place = placeRepository.findPlaceById(id);
             if(place == null) throw new NotFoundException("Place");
             return Collections.singleton(place);
+        } else if (catName != null) {
+            LOG.info("Searching for places with catName: {}", catName);
+            if (categoryRepository.findCategoryByCatNameEquals(catName) == null) throw new NotFoundException("Category");
+            return placeRepository.findPlacesByCategoryName(catName);
         }
         return placeRepository.findAll();
 
     }
-    @GetMapping("/category/{catName}")
-    public Iterable<Place> findByCategory(@PathVariable String catName) {
-        LOG.info("Searching for place: {}", catName);
-        if (categoryRepository.findCategoryByCatNameEquals(catName) == null) throw new NotFoundException("Category");
-        return placeRepository.findPlacesByCategoryName(catName);
-    }
-
     @Transactional
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
