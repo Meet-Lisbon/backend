@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import pt.meetlisbon.backend.exceptions.NotFoundException;
+import pt.meetlisbon.backend.models.entities.Category;
 import pt.meetlisbon.backend.models.entities.Place;
 import pt.meetlisbon.backend.models.repository.CategoryRepository;
 import pt.meetlisbon.backend.models.repository.PlaceRepository;
@@ -33,24 +34,30 @@ public class PlaceController {
     }
 
     @GetMapping
-    public Iterable<Place> findByName(@RequestParam(required = false) String name,
+    public Iterable<Place> findByName(@RequestParam(required = false) String placeName,
                                       @RequestParam(required = false) String catName,
-                                      @RequestParam(required = false) UUID id) {
+                                      @RequestParam(required = false) UUID placeId,
+                                      @RequestParam(required = false) UUID catId) {
 
-        if(name != null) {
-            LOG.info("Searching for place: {}", name);
-            Place place = placeRepository.findPlaceByPlaceName(name);
+        if(placeName != null) {
+            LOG.info("Searching for place: {}", placeName);
+            Place place = placeRepository.findPlaceByPlaceName(placeName);
             if(place == null) throw new NotFoundException("Place");
             return Collections.singleton(place);
-        } else if (id != null) {
-            LOG.info("Searching for place: {}", id);
-            Place place = placeRepository.findPlaceById(id);
+        } else if (placeId != null) {
+            LOG.info("Searching for place: {}", placeId);
+            Place place = placeRepository.findPlaceById(placeId);
             if(place == null) throw new NotFoundException("Place");
             return Collections.singleton(place);
         } else if (catName != null) {
             LOG.info("Searching for places with catName: {}", catName);
             if (categoryRepository.findCategoryByCatNameEquals(catName) == null) throw new NotFoundException("Category");
             return placeRepository.findPlacesByCategoryName(catName);
+        } else if (catId != null) {
+            LOG.info("Searching for places with catName: {}", catId);
+            Category category = categoryRepository.findCategoryByIdEquals(catId);
+            if (category == null) throw new NotFoundException("Category");
+            return placeRepository.findPlacesByCategoryName(category.getCatName());
         }
         return placeRepository.findAll();
 
