@@ -16,8 +16,8 @@ import java.util.UUID;
 @Setter
 public class User {
     @Id
-//    @Type(type = "org.hibernate.type.PostgresUUIDType")
-    @Column(name = "usr_id", nullable = false)@Type(type="pg-uuid")
+    @Column(name = "usr_id", nullable = false)
+    @Type(type="pg-uuid")
 
     private UUID id;
 

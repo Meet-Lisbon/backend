@@ -19,6 +19,7 @@ import pt.meetlisbon.backend.services.UserService;
 
 import javax.transaction.Transactional;
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.UUID;
 
 /**
@@ -29,7 +30,7 @@ import java.util.UUID;
  * It also calls functions from {@link UserService} for specific user behaviour.
  */
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 @AllArgsConstructor
 public class UserController {
     final UserRepository userRepository;
@@ -37,19 +38,6 @@ public class UserController {
     private final EmailSender emailSender;
     private final RandomService randomService;
     private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
-
-    /**
-     * Retrieves all users from {@link #userRepository}
-     * @return {@link Iterable} of type {@link User}
-     */
-    @GetMapping("/all")
-    public Iterable<User> getAll(Authentication authentication) {
-        User myUser = userRepository.findUserByUsrNameEquals(authentication.getName());
-        LOG.info("Role: {}", myUser.getUsrRole());
-        if(myUser.getUsrRole() == UserRole.user) throw new NotAuthorizedException();
-        return userRepository.findAll();
-    }
-
     @GetMapping("/me")
     public User getMe(Authentication authentication) {
         User myUser = userRepository.findUserByUsrNameEquals(authentication.getName());
@@ -58,34 +46,24 @@ public class UserController {
     }
 
     /**
-     * Deletes all users from {@link #userRepository}
-     */
-    @DeleteMapping("/all")
-    @Transactional
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUsers() {
-        userRepository.deleteAll();
-    }
-
-    /**
      * Gets user from email or username
-     * At least one parameter must be present
+     * If no params are present, returns all users
      * @param email a {@link String} object passed as request parameter
      * @param username a {@link String} object passed as request parameter
      * @throws NotFoundException if user was not found
-     * @return {@link User} object on success
+     * @return {@link Iterable} of type {@link User} object on success
      * @see org.hibernate.service.spi.ServiceException
      */
     @GetMapping
-    public User getUser(@RequestParam(required = false) String email,
+    public Iterable<User> getUsers(@RequestParam(required = false) String email,
                         @RequestParam(required = false) String username) {
         User user = null;
         if(email != null) user = userRepository.findByUsrEmailEquals(email);
         else if(username != null) user = userRepository.findUserByUsrNameEquals(username);
         if(user == null) {
-            throw new NotFoundException("User");
+            return userRepository.findAll();
         }
-        return user;
+        return Collections.singleton(user);
     }
 
 
@@ -119,6 +97,8 @@ public class UserController {
             user.setUsrName(createUser.getUsrName());
             user.setUsrPasswordHash(createUser.getUsrPassword());
             user.setUsrRole(UserRole.user);
+            user.setUsrActive(true);
+            user.setUsrEmailVerified(false);
             user.setUsrRegisterCode(usr_verification);
             user.setUsrResetCodeAt(OffsetDateTime.now());
             user.setCreatedAt(OffsetDateTime.now());
@@ -140,7 +120,7 @@ public class UserController {
     public GenericMsg verifyUser(@PathVariable String code) {
         User user = userRepository.findUserByUsrRegisterCodeEquals(code);
         if(user == null) throw new InvalidCodeException("Registration code is invalid");
-        user.setUsrActive(true);
+        user.setUsrEmailVerified(true);
         user.setUsrRegisterCode(null);
         userRepository.save(user);
         return new GenericMsg("User is verified");
